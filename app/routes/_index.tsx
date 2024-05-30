@@ -7,16 +7,22 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+let nextOrderId = 1;
+
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const size = formData.get("size");
   const toppings = formData.getAll("toppings");
 
-  console.log(`Ordering a ${size} pizza with ${toppings.join(", ")}`);
+  const orderId = nextOrderId++;
+
+  console.log(
+    `[Order ${orderId}] Ordering a ${size} pizza with ${toppings.join(", ")}`
+  );
 
   return new Response(null, {
     status: 302,
-    headers: { Location: "/confirmation" },
+    headers: { Location: `/confirmation?orderId=${orderId}` },
   });
 }
 
