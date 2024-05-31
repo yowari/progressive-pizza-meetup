@@ -1,4 +1,5 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
+import { Form, useActionData } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -14,6 +15,10 @@ export async function action({ request }: ActionFunctionArgs) {
   const size = formData.get("size");
   const toppings = formData.getAll("toppings");
 
+  if (!size) {
+    return { errors: { size: "Veuillez selectionner la taille" } };
+  }
+
   const orderId = nextOrderId++;
 
   console.log(
@@ -27,11 +32,13 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Index() {
+  const actionData = useActionData<typeof action>();
+
   return (
     <main>
       <h2>Remixez votre pizza</h2>
 
-      <form method="POST" action="?index">
+      <Form method="POST" action="?index">
         <fieldset>
           <legend>Selectionnez la taille</legend>
 
@@ -49,6 +56,11 @@ export default function Index() {
             <input type="radio" name="size" value="large" />
             Large
           </label>
+          {actionData?.errors?.size && (
+            <p>
+              <em>{actionData.errors.size}</em>
+            </p>
+          )}
         </fieldset>
 
         <fieldset>
@@ -61,7 +73,7 @@ export default function Index() {
         </fieldset>
 
         <button type="submit">Commander</button>
-      </form>
+      </Form>
     </main>
   );
 }
